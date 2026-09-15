@@ -1,0 +1,16 @@
+# build output
+dist/
+src/bin/
+src/obj/
+
+# js deps + lockfile noise
+src/web-src/node_modules/
+
+# the decompiled Store app: third-party binaries, not ours to redistribute
+original/
+
+# local scratch
+tools/__pycache__/
+
+# bundled by esbuild from src/web-src
+src/web/editor.js
