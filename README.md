@@ -1,30 +1,47 @@
-# MarkdownView
+# MarkdownView — fullscreen WYSIWYG Markdown editor for Windows
 
-A fullscreen markdown editor for Windows that opens a `.md` file straight into a rendered, editable page. No toolbar, no status bar, no mode switch. Type `# ` and it becomes a heading while you write.
+Double-click a `.md` file and it opens as a rendered page you can type into. No toolbar, no split pane, no raw `#` symbols. Dark theme, fullscreen, Ctrl+S to save. That's the whole app.
 
-It started as a patch of a read-only markdown viewer from the Microsoft Store, which had no way to edit the file you were looking at. The viewer was decompiled to recover its look, then rebuilt from scratch as an editor that keeps the same dark theme.
+![MarkdownView editing a markdown file fullscreen on Windows, dark theme, no toolbar](docs/screenshot.png)
+
+**[Download the latest release](https://github.com/ArturLys/markdown-editor-windows/releases/latest)** · Windows 10/11 · free · MIT
+
+## Credit where it's due
+
+This is [MarkdownView by DBMaster](https://apps.microsoft.com/detail/9n6pkz6fp1ml) from the Microsoft Store, with one change: **the text is editable.**
+
+Their app is a beautiful fullscreen markdown *viewer*. I loved the look and hated that I had to open a second program to change a word. So I decompiled it to keep the exact theme, then rebuilt the inside as an editor. The dark palette, the type, the spacing, the layout: all theirs. Go install the original if you only need to read.
 
 ## What it does
 
-- Opens straight into edit mode. The file is live text, not a preview you have to switch away from.
-- Markdown input rules as you type: `# `, `## `, `- `, `1. `, `> `, `` ``` ``, `[ ] `, `**bold**`, `*italic*`, `` `code` ``.
-- **Ctrl+S** saves. That is the only shortcut worth remembering.
-- **Esc**, **Alt+F4**, or the ✕ in the corner closes, saving first if anything changed.
-- Fullscreen and chromeless. Nothing on screen but the document.
+- **Opens straight into editing.** No view mode, no edit mode. The document is the editor.
+- **Markdown as you type.** `# ` becomes a heading, `- ` a list, `> ` a quote, `` ``` `` a code block, `[ ] ` a checkbox, `**bold**` bold. The syntax disappears and the formatting stays, the way Notion or Typora do it.
+- **One shortcut.** Ctrl+S saves the file as plain markdown. Esc or the ✕ closes, saving first if anything changed.
+- **Nothing else on screen.** Fullscreen, borderless, no status bar, no mode switch, no settings.
+- **Real `.md` on disk.** It reads and writes ordinary markdown, so the file still works in Obsidian, GitHub, VS Code, wherever.
 
-## How it is built
+Good for: quick notes, READMEs, journals, todo lists, reading docs you occasionally need to fix a typo in. Not trying to be Obsidian.
+
+## Install
+
+1. Grab `MarkdownView-win-x64.zip` from [Releases](https://github.com/ArturLys/markdown-editor-windows/releases/latest) and unzip it anywhere.
+2. Right-click any `.md` file → **Open with** → **Choose another app** → browse to `MarkdownView.exe` → tick **Always**.
+
+That's it. There is no installer. The `-selfcontained` zip bundles the .NET runtime; the smaller one needs the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0). Both need the WebView2 runtime, which Windows 11 ships with.
+
+## How it's built
 
 | Layer | What |
 |---|---|
-| Shell | WPF, .NET 10, a borderless maximized window |
-| Surface | WebView2 hosting a local page over a virtual host mapping |
-| Editor | TipTap (ProseMirror) with markdown serialization, bundled offline by esbuild |
+| Shell | WPF on .NET 10, one borderless maximized window |
+| Surface | WebView2 rendering a local page over a virtual host |
+| Editor | [TipTap](https://tiptap.dev) (ProseMirror) with [tiptap-markdown](https://github.com/aguingand/tiptap-markdown), bundled offline by esbuild |
 
-The C# side owns the file: it reads on load, receives the markdown back over the WebView message channel, and writes to disk. The page never touches the filesystem.
+The C# side owns the file: it reads it on launch, gets the markdown back over the WebView message channel, and writes it to disk. The web page never touches the filesystem.
 
-Bullets are drawn with a `::before` dot rather than a native list marker. Native `::marker` geometry cannot be addressed from CSS or measured from script, so task checkboxes could not be aligned to it; drawing both markers by hand puts them on one axis.
+Bullets are drawn with a `::before` dot instead of a native list marker. Native `::marker` geometry can't be styled or measured, so task checkboxes couldn't be lined up with it. Drawing both by hand puts them on the same axis.
 
-## Build
+### Build from source
 
 Needs the .NET 10 SDK and Node.
 
@@ -33,14 +50,19 @@ cd src/web-src && npm install && npm run build
 cd .. && dotnet publish -c Release -o ../dist
 ```
 
-The first command bundles the editor into `src/web/editor.js`. The second produces `dist/MarkdownView.exe`.
+First command bundles the editor into `src/web/editor.js`, second one produces `dist/MarkdownView.exe`.
 
-## Use it for .md files
+## Why not just use…
 
-Run the exe with a path, or right-click a `.md` file → Open with → Choose another app → browse to `dist/MarkdownView.exe` → tick Always.
+- **Typora**: paid, and more than I needed.
+- **Obsidian**: a vault, plugins, a sidebar. I wanted a file.
+- **VS Code**: raw markdown with a preview pane. I wanted the page.
+- **Notepad**: no.
 
-Windows validates the default-app registry entry with a per-user hash, so the association cannot be scripted without reproducing that hash. `tools/userchoice_hash.py` is an unfinished port of it, kept only as a starting point.
+## Setting it as the default .md app
 
-## Note on the original
+Windows validates the default-app registry entry with a per-user hash, so the association can't be set by a script without reproducing that hash. `tools/userchoice_hash.py` is an unfinished port of it. Use the Open-with dialog instead; it takes ten seconds.
 
-The dark stylesheet comes from the Store viewer this replaced, recovered by decompiling it. The app's own binaries are not in this repository. Everything else here is a rewrite.
+## License
+
+MIT. The theme is DBMaster's, see [LICENSE](LICENSE). Their compiled app is not in this repo.
