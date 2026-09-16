@@ -52,6 +52,11 @@ window.loadMarkdown = function (md) {
   editor.commands.setContent(md, false);
   editor.commands.focus('start');
   loading = false;
+  // Tell the host once this content is actually on screen; it keeps the
+  // window off-screen until then so no empty frame is ever visible.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (host) host.postMessage({ type: 'painted' });
+  }));
 };
 window.getMarkdown = function () {
   return editor.storage.markdown.getMarkdown();

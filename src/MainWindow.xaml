@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="Markdown"
-        WindowState="Maximized"
         WindowStyle="None"
+        WindowStartupLocation="Manual"
+        ShowInTaskbar="True"
         Background="#1e1e2e">
   <Grid>
     <wv2:WebView2 x:Name="WebView" DefaultBackgroundColor="#1e1e2e" />
