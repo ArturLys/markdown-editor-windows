@@ -22,6 +22,12 @@ public partial class App : Application
         Diag.Log("App.OnStartup");
         string? path = e.Args.Length != 0 ? e.Args[0] : null;
 
+        // Must be set before the browser process starts. The WebView2 control's
+        // own DefaultBackgroundColor only takes effect once the controller
+        // exists, which leaves a window where the view paints its default
+        // white; this closes that window. ARGB hex.
+        Environment.SetEnvironmentVariable("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", "FF1E1E2E");
+
         // Trim what the browser process does on the way up: no component
         // updates, no first-run work, no background networking, and none of the
         // features this app can never use.
@@ -49,7 +55,12 @@ public partial class App : Application
         }
 
         base.OnStartup(e);
-        new MainWindow(path).Show();
-        Diag.Log("window shown (offscreen)");
+        // Shown immediately but positioned off-screen; it moves into view once
+        // the document has painted. WPF will not lay out, and therefore will
+        // not initialise anything, inside a window that was never shown.
+        var w = new MainWindow(path);
+        MainWindow = w;
+        w.Show();
+        Diag.Log("window shown (off-screen)");
     }
 }

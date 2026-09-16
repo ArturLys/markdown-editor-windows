@@ -5,12 +5,16 @@
         Title="Markdown"
         WindowStyle="None"
         WindowStartupLocation="Manual"
-        ShowInTaskbar="True"
+        ResizeMode="NoResize"
         Background="#1e1e2e">
   <Grid>
-    <wv2:WebView2 x:Name="WebView" DefaultBackgroundColor="#1e1e2e" />
+    <Border Background="#1e1e2e">
+      <wv2:WebView2 x:Name="WebView" DefaultBackgroundColor="#1e1e2e" />
+    </Border>
 
-    <Popup x:Name="ClosePopup" Placement="Absolute" AllowsTransparency="True" StaysOpen="True" IsOpen="True">
+    <!-- Its own top-level window, so it is not covered by the main window while
+         that is still transparent. Stays shut until there is something to sit on. -->
+    <Popup x:Name="ClosePopup" Placement="Absolute" AllowsTransparency="True" StaysOpen="True" IsOpen="False">
       <Button x:Name="CloseButton" Width="40" Height="32" Cursor="Hand" ToolTip="Close"
               Foreground="#6c7086" Background="Transparent" BorderThickness="0"
               FontFamily="Segoe UI" FontSize="16" Content="✕">
